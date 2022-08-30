@@ -15,7 +15,7 @@ groups:
         - 4
         - 6
       unit_types:
-        - flak18
+        - KS-19
     - name: Cold War Flak Site S-60
       unit_count:
         - 2
