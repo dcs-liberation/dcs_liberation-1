@@ -2,7 +2,8 @@ name: Cold-War-Flak
 tasks:
   - AAA
 units:
-  - 8.8 cm Flak 18
-  - S-60 57mm
+  - AAA KS-19 100mm
+  - AAA S-60 57mm
+  - AAA Fire Can SON-9
 layouts:
   - Cold War Flak Site
