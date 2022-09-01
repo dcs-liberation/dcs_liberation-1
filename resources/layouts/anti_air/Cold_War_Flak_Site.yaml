@@ -4,12 +4,12 @@ tasks:
 groups:
   - AAA:
     - name: Cold War Flak Site Radar 
-      optional: true # Only available to Late Cold War
+      optional: false # Only available to Late Cold War
       fill: false # Do not fill with faction possible units
       unit_count:
         - 1
-      unit_classes:
-        - SearchRadar
+      unit_types:
+        - SON_9
     - name: Cold War Flak Site Flak
       unit_count:
         - 4
@@ -28,7 +28,6 @@ groups:
       unit_classes:
         - AAA
     - name: Cold War Flak Site Logistics
-      optional: true
       unit_count:
         - 1
         - 2
