@@ -4,7 +4,7 @@ import itertools
 import logging
 import math
 from collections.abc import Iterator
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from enum import Enum
 from typing import Any, List, TYPE_CHECKING, Type, Union, cast
 from uuid import UUID
@@ -95,6 +95,7 @@ class Game:
         theater: ConflictTheater,
         air_wing_config: CampaignAirWingConfig,
         start_date: datetime,
+        start_time: time | None,
         settings: Settings,
         player_budget: float,
         enemy_budget: float,
@@ -119,7 +120,15 @@ class Game:
 
         self.db = GameDb()
 
-        self.conditions = self.generate_conditions()
+        if start_time is None:
+            self.time_of_day_offset_for_start_time = list(TimeOfDay).index(
+                TimeOfDay.Day
+            )
+        else:
+            self.time_of_day_offset_for_start_time = list(TimeOfDay).index(
+                self.theater.daytime_map.best_guess_time_of_day_at(start_time)
+            )
+        self.conditions = self.generate_conditions(forced_time=start_time)
 
         self.sanitize_sides(player_faction, enemy_faction)
         self.blue = Coalition(self, player_faction, player_budget, player=True)
@@ -154,9 +163,13 @@ class Game:
     def transit_network_for(self, player: bool) -> TransitNetwork:
         return self.coalition_for(player).transit_network
 
-    def generate_conditions(self) -> Conditions:
+    def generate_conditions(self, forced_time: time | None = None) -> Conditions:
         return Conditions.generate(
-            self.theater, self.current_day, self.current_turn_time_of_day, self.settings
+            self.theater,
+            self.current_day,
+            self.current_turn_time_of_day,
+            self.settings,
+            forced_time=forced_time,
         )
 
     @staticmethod
@@ -271,7 +284,10 @@ class Game:
                     events.update_front_line(front_line)
                 cp.base.affect_strength(+PLAYER_BASE_STRENGTH_RECOVERY)
 
-        self.conditions = self.generate_conditions()
+        # We don't actually advance time or change the conditions between turn 0 and
+        # turn 1.
+        if self.turn > 1:
+            self.conditions = self.generate_conditions()
 
     def begin_turn_0(self) -> None:
         """Initialization for the first turn of the game."""
@@ -424,7 +440,8 @@ class Game:
 
     @property
     def current_turn_time_of_day(self) -> TimeOfDay:
-        return list(TimeOfDay)[self.turn % 4]
+        tod_turn = max(0, self.turn - 1) + self.time_of_day_offset_for_start_time
+        return list(TimeOfDay)[tod_turn % 4]
 
     @property
     def current_day(self) -> date:
