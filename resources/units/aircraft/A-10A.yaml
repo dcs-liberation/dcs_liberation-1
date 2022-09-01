@@ -13,5 +13,6 @@ manufacturer: Fairchild Republic
 origin: USA
 price: 12
 role: Close Air Support/Attack
+max_range: 360
 variants:
   A-10A Thunderbolt II: {}
