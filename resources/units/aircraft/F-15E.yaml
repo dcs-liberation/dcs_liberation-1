@@ -7,6 +7,6 @@ manufacturer: McDonnell Douglas
 origin: USA
 price: 24
 role: Multirole Strike Fighter
-max_range: 300
+max_range: 700
 variants:
   F-15E Strike Eagle: {}
